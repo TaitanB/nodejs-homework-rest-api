@@ -6,8 +6,8 @@ const add = async (req, res) => {
   const { _id: owner } = req.user;
   const { email, phone } = req.body;
 
-  const contactEmail = await Contact.findOne({ email });
-  const contactPhone = await Contact.findOne({ phone });
+  const contactEmail = await Contact.findOne({ email, owner });
+  const contactPhone = await Contact.findOne({ phone, owner });
 
   if (contactEmail) {
     throw HttpError(409, "This email already exists in the contacts");
