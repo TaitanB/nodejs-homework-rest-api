@@ -3,6 +3,7 @@ const request = require("supertest");
 require("dotenv").config();
 
 const app = require("../../app");
+const User = require("../../models/user");
 
 const { DB_HOST } = process.env;
 
@@ -14,32 +15,53 @@ describe("login controller", () => {
     mongoose.connect(DB_HOST);
   });
 
-  test("should return Unauthorized error", async () => {
+  it("should return Unauthorized error 401", async () => {
     const testData = {
-      email: "test@mail.com",
+      email: "fabomec655@fulwark.com",
       password: "test1111",
     };
 
-    const res = await request(app).post("/api/users/login").send(testData);
+    const response = await request(app).post("/api/users/login").send(testData);
 
-    expect(res.statusCode).toBe(401);
+    expect(response.statusCode).toBe(401);
   });
 
-  test("should return Unauthorized error", async () => {
+  it("should return Unauthorized error 401", async () => {
     const testData = {
-      email: "test1@mail.com",
-      password: "test111",
+      email: "fabomec654@fulwark.com",
+      password: "test1112",
     };
 
-    const res = await request(app).post("/api/users/login").send(testData);
+    const response = await request(app).post("/api/users/login").send(testData);
 
-    expect(res.statusCode).toBe(401);
+    expect(response.statusCode).toBe(401);
   });
 
-  test("should return token and user email and user password", async () => {
-    const response = await request(app)
-      .post("/api/users/login")
-      .send({ email: "test@mail.com", password: "test111" });
+  it("should return verified/unverified email statusCode 200/401", async () => {
+    const testData = {
+      email: "fabomec654@fulwark.com",
+      password: "test1111",
+    };
+
+    const user = await User.findOne({ email: testData.email });
+    const isEmailVerified = user.verify;
+
+    const response = await request(app).post("/api/users/login").send(testData);
+
+    if (isEmailVerified) {
+      expect(response.statusCode).toBe(200);
+    } else {
+      expect(response.statusCode).toBe(401);
+    }
+  });
+
+  it("should return token and user email and user password", async () => {
+    const testData = {
+      email: "fabomec654@fulwark.com",
+      password: "test1111",
+    };
+
+    const response = await request(app).post("/api/users/login").send(testData);
 
     const {
       _body: { token, user },
