@@ -1,9 +1,7 @@
 const express = require("express");
 
 const { verifyEmail, resendVerifyEmail } = require("../../controllers/auth");
-
 const { emailSchema } = require("../../schemas/users");
-
 const { validateBody } = require("../../decorators");
 
 const router = express.Router();
